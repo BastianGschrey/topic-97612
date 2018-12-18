@@ -1,0 +1,11 @@
+*build-*
+*.user
+Documents/
+
+\.~lock\.PowerTune_Manual\.doc#
+
+*.dbbf9ac
+
+udpreceiver\.cpp\.autosave
+
+daemons/DataLog\.csv
