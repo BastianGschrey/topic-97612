@@ -68,7 +68,7 @@ ApplicationWindow  {
 
         //text: dataSourceModel.get(cbx_sources.currentIndex).value
 
-        text: dataSourceModel.data(cbx_sources.currentIndex,259)
+        text: dataSourceModel.get(cbx_sources.currentIndex).value
 
         font.pixelSize: 12
     }
@@ -81,7 +81,7 @@ ApplicationWindow  {
 
 
     function debug(){
-console.log(dataSourceModel.data(cbx_sources.currentIndex,259));
+console.log(dataSourceModel.get(cbx_sources.currentIndex));
 }
 
 
