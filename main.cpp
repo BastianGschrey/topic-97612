@@ -2,9 +2,9 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QFile>
-#include "Connectudp.h"
+#include "connectudp.h"
 #include <qdebug.h>
-#include <datasourceobject.h>
+#include "datasourceobject.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +19,6 @@ int main(int argc, char *argv[])
         app.setApplicationName("PowerTune 2");
 
         QQmlApplicationEngine engine;
-        qmlRegisterType<DataSourceObject>();
         qmlRegisterType<ConnectUdp>("com.powertune", 2, 0, "ConnectUdpObject");
         engine.rootContext()->setContextProperty("ConnectUdp", new ConnectUdp(&engine));
         engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

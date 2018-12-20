@@ -21,27 +21,27 @@ public:
 
     datasourcemodel(QObject *parent = nullptr);
 
-    void addDataSourceObject(DataSourceObject* dataSourceObject);
+    void addDataSourceObject(const DataSourceObject &dataSourceObject);
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
 
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    Q_INVOKABLE DataSourceObject *get(int idx);
+    QVariantMap get(int row) const;
 
 public slots:
 
     void updateDataChanged();
 
 protected:
-    QHash<int, QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
-    QList<DataSourceObject*> m_DataSourceObjects;
+    QList<DataSourceObject> m_DataSourceObjects;
 
 
 

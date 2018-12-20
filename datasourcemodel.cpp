@@ -6,12 +6,12 @@ datasourcemodel::datasourcemodel(QObject *parent)
 {
 }
 
-void datasourcemodel::addDataSourceObject(DataSourceObject *dataSourceObject)
+void datasourcemodel::addDataSourceObject(const DataSourceObject &dataSourceObject)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_DataSourceObjects.append(dataSourceObject);
+    m_DataSourceObjects << dataSourceObject;
     endInsertRows();
-    connect(dataSourceObject,&DataSourceObject::valueChanged, this, &datasourcemodel::updateDataChanged);
+
 }
 
 
@@ -21,20 +21,20 @@ int datasourcemodel::rowCount(const QModelIndex & parent) const{
     return m_DataSourceObjects.count();
 }
 
-QVariant datasourcemodel::data(const QModelIndex & index, int role) const{
+QVariant datasourcemodel::data(const QModelIndex &index, int role) const{
     if(index.row() < 0 || index.row() >= m_DataSourceObjects.count())
         return  QVariant();
 
-    const DataSourceObject *dataSourceObject = m_DataSourceObjects[index.row()];
+    const DataSourceObject &dataSourceObject = m_DataSourceObjects[index.row()];
     if (role == idRole)
-        return dataSourceObject->id();
+        return dataSourceObject.id();
     else if (role == nameRole)
-        return dataSourceObject->name();
+        return dataSourceObject.name();
     else if (role == displaynameRole) {
-        return dataSourceObject->displayname();
+        return dataSourceObject.displayname();
     }
     else if (role == valueRole)
-        return dataSourceObject->value();
+        return dataSourceObject.value();
     //else if (role == allRole)
     //    return get(index.row());
     return QVariant();
@@ -42,24 +42,24 @@ QVariant datasourcemodel::data(const QModelIndex & index, int role) const{
 
 bool datasourcemodel::setData(const QModelIndex &index, const QVariant &value, int role){
 
-    DataSourceObject *dataSourceObject = m_DataSourceObjects[index.row()];
+    DataSourceObject &dataSourceObject = m_DataSourceObjects[index.row()];
     if(role == idRole){
-        dataSourceObject->setid(value.toInt());
+        dataSourceObject.setid(value.toInt());
         emit dataChanged(index,index);
         return true;
     }
     else if(role == nameRole){
-        dataSourceObject->setname(value.toString());
+        dataSourceObject.setname(value.toString());
         emit dataChanged(index,index);
         return true;
     }
     else if(role == displaynameRole){
-        dataSourceObject->setdisplayname(value.toString());
+        dataSourceObject.setdisplayname(value.toString());
         emit dataChanged(index,index);
         return true;
     }
     else if(role == valueRole){
-        dataSourceObject->setvalue(value.toDouble());
+        dataSourceObject.setvalue(value.toDouble());
         emit dataChanged(index,index);
         return true;
     }
@@ -72,20 +72,27 @@ bool datasourcemodel::setData(const QModelIndex &index, const QVariant &value, i
 
 void datasourcemodel::updateDataChanged()
 {
-    qDebug() << Q_FUNC_INFO << "update the UI" <<endl;
-    QModelIndex start = createIndex(0,0);
-    emit dataChanged(start, start);
+    QModelIndex index = createIndex(0,0);
+    emit dataChanged(index, index);
 }
 
-DataSourceObject *datasourcemodel::get(int idx)
+
+QVariantMap datasourcemodel::get(int row) const
 {
-    //QModelIndex index = createIndex(idx,0);
-    DataSourceObject *dataSourceObject = m_DataSourceObjects.at(idx);
-    if(dataSourceObject!=nullptr){
-        return dataSourceObject;
+    QHash<int, QByteArray> names = roleNames();
+    QHashIterator<int, QByteArray> i(names);
+    QVariantMap res;
+    QModelIndex idx = index(row, 0);
+    while(i.hasNext()) {
+        i.next();
+        if(i.key() != allRole){
+            QVariant data = idx.data(i.key());
+            res[i.value()] = data;
+        }
     }
-
+    return res;
 }
+
 
 
 QHash<int, QByteArray> datasourcemodel::roleNames() const {

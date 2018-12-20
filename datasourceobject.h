@@ -5,17 +5,17 @@
 
 
 
-class DataSourceObject : public QObject
+class DataSourceObject
 
 {
-    Q_OBJECT
+
     Q_PROPERTY(double value READ value WRITE setvalue NOTIFY valueChanged)
 
 public:
 
     //Constructors and destructors
-    DataSourceObject();
-    DataSourceObject(const int &id, const QString &name, const QString &displayname, const double &value, QObject *parent = nullptr);
+
+    DataSourceObject(const int &id, const QString &name, const QString &displayname, const double &value);
 
 
 

@@ -63,32 +63,13 @@ void ConnectUdp::initDataSources(){
 
         m_DataSourceArray = m_DataSourceObject.value(QString("datasources")).toArray();
 
-        //create for each Datasource a Instance of DataSourceObject
-
-        //DataSourceObject *datasource = new DataSourceObject;
-        //datasource->setid(88);
-        //datasource->setdisplayname("rpm");
-        //datasource->setname("rpm");
-        //m_DataSourceModel.addDataSourceObject(datasource);
-
         for (const auto obj : m_DataSourceArray){
 
-            DataSourceObject *m_datasource = new DataSourceObject;
-            m_datasource->setid(obj.toObject().value("id").toInt());
-            m_datasource->setname(obj.toObject().value("name").toString());
-            m_datasource->setdisplayname(obj.toObject().value("displayname").toString());
-            m_datasource->setvalue(0);
-            m_DataSourceModel.addDataSourceObject(m_datasource);
-;
 
-
-
-           //m_DataSourceModel.addDataSourceObject(DataSourceObject(obj.toObject().value("id").toInt(),
-           //                                                       obj.toObject().value("name").toString(),
-           //                                                       obj.toObject().value("displayname").toString(),
-           //                                                       0));
-
-
+           m_DataSourceModel.addDataSourceObject(DataSourceObject(obj.toObject().value("id").toInt(),
+                                                                  obj.toObject().value("name").toString(),
+                                                                  obj.toObject().value("displayname").toString(),
+                                                                  0));
         }
 
         return;
@@ -148,12 +129,6 @@ void ConnectUdp::processPendingDatagrams(){
         QVariant v1 = m_DataSourceModel.data(childIndex, Qt::UserRole);
         QVariant v2 = m_DataSourceModel.data(childIndex, Qt::UserRole+2);
         QVariant v3 = m_DataSourceModel.data(childIndex, Qt::UserRole+3);
-
-        //qWarning() << v1.toInt() << v2.toString() << v3.toDouble();
-
-
-
-
 
     }
 }

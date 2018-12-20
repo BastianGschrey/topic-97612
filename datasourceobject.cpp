@@ -2,13 +2,8 @@
 
 
 
-DataSourceObject::DataSourceObject()
-{
-
-}
-
-DataSourceObject::DataSourceObject(const int &id, const QString &name, const QString &displayname, const double &value, QObject *parent)
-    :QObject(parent), m_id(id), m_name(name), m_displayname(displayname), m_value(value)
+DataSourceObject::DataSourceObject(const int &id, const QString &name, const QString &displayname, const double &value)
+    : m_id(id), m_name(name), m_displayname(displayname), m_value(value)
 {
 
 }
@@ -65,9 +60,11 @@ void DataSourceObject::setvalue(const double &value)
 {
     //if(value != m_value) {
         m_value = value;
-        emit valueChanged();
+        //emit valueChanged();
         //}
 }
+
+
 
 
 
