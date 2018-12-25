@@ -1,19 +1,16 @@
-#include <QDebug>
-#include <QQmlContext>
-#include <QQmlApplicationEngine>
-#include <QQmlEngine>
+#include "connectudp.h"
+
+#include <QDataStream>
 #include <QFile>
-#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonValue>
-#include <QJsonArray>
-#include <QDataStream>
-#include <connectudp.h>
-#include "datasourceobject.h"
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QUdpSocket>
 
-ConnectUdp::ConnectUdp(QObject *parent)
-    : QObject(parent)
+ConnectUdp::ConnectUdp(QObject *parent) : QObject(parent),
+    m_QUdpSocket(nullptr),
+    engine(nullptr)
 {
     //this Map contains all datasources as Object! Definition in datasourceobject.h!
     this->initDataSources();
@@ -58,24 +55,16 @@ void ConnectUdp::initDataSources(){
         datasourcesjson.close();
 
         QJsonDocument m_DataSourceDocument = QJsonDocument::fromJson(jsonFileValue.toUtf8());
-
         QJsonObject m_DataSourceObject = m_DataSourceDocument.object();
 
         m_DataSourceArray = m_DataSourceObject.value(QString("datasources")).toArray();
 
         for (const auto obj : m_DataSourceArray){
-
-
-           m_DataSourceModel.addDataSourceObject(DataSourceObject(obj.toObject().value("id").toInt(),
-                                                                  obj.toObject().value("name").toString(),
-                                                                  obj.toObject().value("displayname").toString(),
-                                                                  0));
+            m_DataSourceModel.addDataSourceObject(DataSourceObject(obj.toObject()));
         }
 
         return;
-
     }
-
 }
 
 
@@ -84,7 +73,7 @@ void ConnectUdp::startUdpReceiver(){
     m_QUdpSocket = new QUdpSocket(this);
     m_QUdpSocket->bind(45454, QUdpSocket::ShareAddress);
 
-    connect(m_QUdpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+    connect(m_QUdpSocket, &QIODevice::readyRead, this, &ConnectUdp::processPendingDatagrams);
 }
 
 
@@ -108,28 +97,20 @@ void ConnectUdp::processPendingDatagrams(){
         if(m_rawData.isEmpty()){
             m_rawData = "0,0";
         }
-
         QStringList m_list = m_rawData.split( "," );
         int messageID = m_list[0].toInt();
         double value = m_list[1].toDouble();
-
         QJsonObject JsonObj = findValueFromJsonArray(m_DataSourceArray,"id",messageID);
         QString messageName = JsonObj.value("displayname").toString().split("\"")[0];
-
         //poc of seeking index
 
         QModelIndex childIndex = m_DataSourceModel.match(m_DataSourceModel.index(0,0),Qt::UserRole,QVariant::fromValue(messageID),1,Qt::MatchRecursive)[0];
-
         //qWarning() << childIndex;
-
         //qWarning() << m_DataSourceModel.setData(childIndex,QVariant(value), Qt::EditRole);
-
         m_DataSourceModel.setData(childIndex,QVariant(value),Qt::UserRole+3);
-
         QVariant v1 = m_DataSourceModel.data(childIndex, Qt::UserRole);
         QVariant v2 = m_DataSourceModel.data(childIndex, Qt::UserRole+2);
         QVariant v3 = m_DataSourceModel.data(childIndex, Qt::UserRole+3);
-
     }
 }
 

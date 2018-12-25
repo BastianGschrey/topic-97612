@@ -1,28 +1,31 @@
 ﻿#include "datasourcemodel.h"
-#include <QDebug>
 
-datasourcemodel::datasourcemodel(QObject *parent)
-    : QAbstractListModel (parent)
+DataSourceModel::DataSourceModel(QObject *parent)
+    : QAbstractListModel(parent)
 {
 }
 
-void datasourcemodel::addDataSourceObject(const DataSourceObject &dataSourceObject)
+QVariantMap DataSourceModel::get(int row) const
+{
+    return m_DataSourceObjects[row].toMap();
+}
+
+void DataSourceModel::addDataSourceObject(const DataSourceObject &dataSourceObject)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     m_DataSourceObjects << dataSourceObject;
     endInsertRows();
-
 }
-
-
-
-int datasourcemodel::rowCount(const QModelIndex & parent) const{
-    Q_UNUSED(parent);
+int DataSourceModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
     return m_DataSourceObjects.count();
 }
 
-QVariant datasourcemodel::data(const QModelIndex &index, int role) const{
-    if(index.row() < 0 || index.row() >= m_DataSourceObjects.count())
+QVariant DataSourceModel::data(const QModelIndex &index, int role) const
+{
+    if(index.row() < 0 || index.row() >= m_DataSourceObjects.count() || !index.isValid())
         return  QVariant();
 
     const DataSourceObject &dataSourceObject = m_DataSourceObjects[index.row()];
@@ -35,73 +38,41 @@ QVariant datasourcemodel::data(const QModelIndex &index, int role) const{
     }
     else if (role == valueRole)
         return dataSourceObject.value();
-    //else if (role == allRole)
-    //    return get(index.row());
     return QVariant();
 }
 
-bool datasourcemodel::setData(const QModelIndex &index, const QVariant &value, int role){
-
+bool DataSourceModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
     DataSourceObject &dataSourceObject = m_DataSourceObjects[index.row()];
-    if(role == idRole){
-        dataSourceObject.setid(value.toInt());
-        emit dataChanged(index,index);
+    if (data(index, role) != value) {
+        if(role == idRole)
+            dataSourceObject.setId(value.toInt());
+        else if(role == nameRole)
+            dataSourceObject.setName(value.toString());
+        else if(role == displaynameRole)
+            dataSourceObject.setDisplayname(value.toString());
+        else if(role == valueRole)
+            dataSourceObject.setValue(value.toDouble());
+        emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
-    else if(role == nameRole){
-        dataSourceObject.setname(value.toString());
-        emit dataChanged(index,index);
-        return true;
-    }
-    else if(role == displaynameRole){
-        dataSourceObject.setdisplayname(value.toString());
-        emit dataChanged(index,index);
-        return true;
-    }
-    else if(role == valueRole){
-        dataSourceObject.setvalue(value.toDouble());
-        emit dataChanged(index,index);
-        return true;
-    }
-
     return false;
-
 }
 
-
-
-void datasourcemodel::updateDataChanged()
+Qt::ItemFlags DataSourceModel::flags(const QModelIndex &index) const
 {
-    QModelIndex index = createIndex(0,0);
-    emit dataChanged(index, index);
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    return Qt::ItemIsEditable; // FIXME: Implement me!
 }
 
-
-QVariantMap datasourcemodel::get(int row) const
+QHash<int, QByteArray> DataSourceModel::roleNames() const
 {
-    QHash<int, QByteArray> names = roleNames();
-    QHashIterator<int, QByteArray> i(names);
-    QVariantMap res;
-    QModelIndex idx = index(row, 0);
-    while(i.hasNext()) {
-        i.next();
-        if(i.key() != allRole){
-            QVariant data = idx.data(i.key());
-            res[i.value()] = data;
-        }
-    }
-    return res;
-}
-
-
-
-QHash<int, QByteArray> datasourcemodel::roleNames() const {
-
     QHash<int, QByteArray> roles;
     roles[idRole] = "id";
     roles[nameRole] = "name";
     roles[displaynameRole] = "displayname";
     roles[valueRole] = "value";
-    roles[allRole] = "all";
-    return roles;
+    return  roles;
 }

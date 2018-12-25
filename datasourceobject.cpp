@@ -1,75 +1,65 @@
 #include "datasourceobject.h"
 
+#include <QJsonObject>
 
-
-DataSourceObject::DataSourceObject(const int &id, const QString &name, const QString &displayname, const double &value)
-    : m_id(id), m_name(name), m_displayname(displayname), m_value(value)
+DataSourceObject::DataSourceObject(const int &id, const QString &name, const QString &displayname, const double &value):
+    m_id(id), m_name(name), m_displayname(displayname), m_value(value)
 {
-
 }
 
+DataSourceObject::DataSourceObject(const QJsonObject &obj)
+{
+    setId(obj.value("id").toInt());
+    setName(obj.value("name").toString());
+    setDisplayname(obj.value("displayname").toString());
+    setValue(0.0);
+}
 
 int DataSourceObject::id() const
 {
     return m_id;
 }
 
-void DataSourceObject::setid(const int &id)
+void DataSourceObject::setId(int id)
 {
-    if (id != m_id) {
-        m_id = id;
-        //emit idChanged();
-    }
+    m_id = id;
 }
-
 
 QString DataSourceObject::name() const
 {
     return m_name;
 }
 
-void DataSourceObject::setname(const QString &name)
+void DataSourceObject::setName(const QString &name)
 {
-    if (name != m_name) {
-        m_name = name;
-        //emit nameChanged();
-    }
+    m_name = name;
 }
-
 
 QString DataSourceObject::displayname() const
 {
     return m_displayname;
 }
 
-void DataSourceObject::setdisplayname(const QString &displayname)
+void DataSourceObject::setDisplayname(const QString &displayname)
 {
-    if (displayname != m_displayname) {
-        m_displayname = displayname;
-        //emit displaynameChanged();
-    }
+    m_displayname = displayname;
 }
-
 
 double DataSourceObject::value() const
 {
     return m_value;
 }
 
-void DataSourceObject::setvalue(const double &value)
+void DataSourceObject::setValue(double value)
 {
-    //if(value != m_value) {
-        m_value = value;
-        //emit valueChanged();
-        //}
+    m_value = value;
 }
 
-
-
-
-
-
-
-
-
-
+QVariantMap DataSourceObject::toMap() const{
+    QVariantMap map;
+    map["id"] = m_id;
+    map["name"] = m_name;
+    map["displayname"] = m_displayname;
+    map["value"] = m_value;
+    return map;
+}

@@ -3,6 +3,8 @@ import QtQuick.Controls 2.3
 import QtQuick.Window 2.2
 import com.powertune 2.0
 import QtQuick.Extras 1.4
+import QtQml.Models 2.3
+import "qrc:/createSquareGaugeScript.js" as CreateSquareGaugeScript
 
 
 ApplicationWindow  {
@@ -18,7 +20,6 @@ ApplicationWindow  {
     ListView {
         id: listviewMain
         width: 100; height: 800
-
         model: dataSourceModel
         delegate: mydelegate
         }
@@ -28,63 +29,57 @@ ApplicationWindow  {
         Text { text: name + " " + value }
     }
 
-    ComboBox {
-        id: cbx_sources
-        x: 600
-        y: 0
-        currentIndex: 1
-        textRole: "name"
-        width: 200; height: 20
+    ItemSelectionModel{
+        id: ism
         model: dataSourceModel
+
     }
 
-    Button {
-        id: button
-        x: 600
-        y: 26
-        text: qsTr("Add")
-        highlighted: false
-        checkable: false
-        autoExclusive: false
-        checked: false
-    }
+        ComboBox {
+            id: cbx_sources
+            x: 600
+            y: 0
+            textRole: "name"
+            width: 200;
+            model: dataSourceModel
+            //onCurrentIndexChanged: text2.text = dataSourceModel.get(currentIndex).value
+            Component.onCompleted: currentIndex = 1
+        }
+        Button {
+            id: button
+            x: 700
+            y: 46
+            text: qsTr("Add")
+            highlighted: false
+            checkable: false
+            autoExclusive: false
+            checked: false
+            onClicked: text2.text = dataSourceModel.data(dataSourceModel.index(cbx_sources.currentIndex,0))
+
+
+
+            }
+
+
 
     Text {
-        id: text1
-        x: 600
-        y: 100
-        width: 100
-        height: 31
-        text: cbx_sources.currentIndex.toString()
-        font.pixelSize: 12
-    }
-
-    Text {
-        id: text2
-        x: 600
-        y: 137
-        width: 100
-        height: 31
-
-        //text: dataSourceModel.get(cbx_sources.currentIndex).value
-
-        text: dataSourceModel.get(cbx_sources.currentIndex).value
-
-        font.pixelSize: 12
-    }
-
-    Connections {
-        target: button
-        onClicked: debug()
-    }
-
-
-
-    function debug(){
-console.log(dataSourceModel.get(cbx_sources.currentIndex).value);
-}
+            id: text1
+            x: 700
+            y: 134
+            width: 100
+            height: 31
+            text: cbx_sources.currentIndex.toString()
+            font.pixelSize: 12
+        }
+        Text {
+            id: text2
+            x: 700
+            y: 92
+            width: 100
+            height: 31
+            font.pixelSize: 12
+        }
 
 
 }
-
 

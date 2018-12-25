@@ -1,53 +1,32 @@
 #ifndef DATASOURCEOBJECT_H
 #define DATASOURCEOBJECT_H
 
-#include <QObject>
-
-
+#include <QString>
+#include <QVariantMap>
 
 class DataSourceObject
-
 {
-
-    Q_PROPERTY(double value READ value WRITE setvalue NOTIFY valueChanged)
-
 public:
-
-    //Constructors and destructors
-
-    DataSourceObject(const int &id, const QString &name, const QString &displayname, const double &value);
-
-
-
+    DataSourceObject(const int &id=0, const QString &name="", const QString &displayname="", const double &value=0.0);
+    DataSourceObject(const QJsonObject &obj);
     int id() const;
-
-    void setid(const int &id);
+    void setId(int id);
 
     QString name() const;
-
-    void setname(const QString &name);
+    void setName(const QString &name);
 
     QString displayname() const;
-
-    void setdisplayname(const QString &displayname);
+    void setDisplayname(const QString &displayname);
 
     double value() const;
-
-    void setvalue(const double &value);
-
-signals:
-    void valueChanged();
-
+    void setValue(double value);
+    QVariantMap toMap() const;
 
 private:
-
     int m_id;
     QString m_name;
     QString m_displayname;
     double m_value;
-
 };
-
-
 
 #endif // DATASOURCEOBJECT_H
